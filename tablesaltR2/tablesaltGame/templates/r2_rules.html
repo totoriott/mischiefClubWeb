@@ -1,0 +1,100 @@
+<head>
+<title>Mischief Club - Rules</title>
+{% load staticfiles %}
+<link href='{% static "stylesheetTutorial.css" %}' rel="stylesheet">
+</head>
+<input type="button" onclick="location.href='{{ lobbyURL }}'" value="Back to lobby"><br>
+<h2>MISCHIEF CLUB</h2>
+draft 1.5 (3/18/2016) by <a href="http://www.twitter.com/sayumeki">sayumeki</a>
+<br>for 2-4 players
+<br><h2>GOAL:</h2>
+Taking place on the sidelines of a fantasy club sport, players aim to score points by correctly betting on a series of matches.
+<br>In each match, players play secret cards on any of the 3 competitors, to earn points faster, and give their chosen competitor an edge.
+<br>
+<br>Play cards to boost your odds, bet strong when your odds are good, and trick your opponents into supporting the wrong side! 
+<br>Manage your cards and your opponents and you might come out a winner!
+<br><h2>GAMEPLAY:</h2>
+<h3>GAME OVERVIEW:</h3>
+In each match, the competitors on the table will compete to get the highest ability score.
+<br>Players secretly play boost cards to bet on competitors and cheer them on, and play their supporter card to choose who they think will win.
+<br>You can't back a competitor once someone else has, so don't wait until the last minute to pick your favorite!
+<br>
+<br>The more cheer a competitor recieves, the higher their ability score, as shown on their competitor card.
+<br>On the other hand, the more bet they recieve, the more valuable their victory becomes!
+<br><h3>GAME SETUP:</h3>
+Shuffle the 20-card competitor deck and place it in the center.
+<br>
+<br>Each player should take their deck of 11 boost cards, drawing the 5 basic cards and 1 supporter card into their hand.
+<br>Place the 5 advanced cards to the side for now.
+<br>Each player's hand is hidden from all other players. 
+<br><h3>GAME FLOW:</h3>
+<ol type="1">
+<li><b>[Setup]</b> Reveal an amount of competitors equal to the number of players, placing them on the table face-up.</li>
+<br>
+<li><b>[Play]</b> All players simultaneously choose a card to play from their hand, as well as a target to play the card on.
+<br>Players should hold their chosen card out face-down when they've decided. 
+<br>
+<br>
+When all players have chosen a card, players simultaneously place their card face-down by their chosen target.
+<br>Certain cards, like the supporter card, specify that they should be placed face-up.<br>
+<br>
+Players who have not supported a competitor yet repeat steps 2 and 3, until everyone has supported a competitor.
+<br>Note that you cannot support a competitor who has already been supported on a previous turn!<br>
+<br>
+<li><b>[Resolution]</b> Reveal all cards played by each player, and calculate the total cheer and total bet for each competitor.
+<br>
+Calculate the ability score for each competitor, according to their cheer.
+<br><br>
+Shuffle and deal one performance card for each competitor, and add its value to their ability score.
+<br>
+The competitor with the highest ability score is the winner of the match! 
+<br>If there is a tie, the competitor with the highest cheer wins.
+<br>If there is still a tie, the competitor with the higher performance card wins.</li>
+<br>
+<li><b>[Scoring]</b> The player who supported the winning competitor earns points equal to the bet on that competitor!<br>
+If multiple players supported that competitor, they split the bet, rounded down.<br>
+A few advanced cards also have ways to earn points!</li>
+<br>
+<li><b>[Cleanup]</b> After the match, players take back all their played cards into their hand.
+<br>Players then may switch one card from their hand with the cards they have set off to the side.
+<br>
+<br>Repeat steps 1-5 for a total of 5 matches.</li>
+</ol>
+<h3>GAME END:</h3>
+After 5 matches, the player with the most points wins!
+<br>If there is a tie, the player who earned more points in the final match wins.
+<br>If there is still a tie, draw performance cards to determine the winner.
+<br><h2>CARD LISTING:</h2>
+<h3>COMPETITOR CARD EXAMPLES:</h3>
+{% for compeCard in allCompetitorCards %}
+	{{ compeCard.getRulesCardHTML|safe }}
+{% endfor %}
+<!--Vektrakt: 0 ability @ 0 cheer, 1 ability @ 2 cheer, 3 ability @ 4 cheer, 4 ability @ 8 cheer
+<br>Fantastic Melty Core: 2 ability @ 0 cheer, 3 ability @ 3 cheer, 4 ability @ 7 cheer
+<br>Zentheil: 2 ability @ 0 cheer, 3 ability @ 2 cheer, 1 ability @ 6 cheer
+<br>Repentor: 4 ability @ 0 cheer, 3 ability @ 3 cheer, 2 ability @ 5 cheer, 1 ability @ 8 cheer
+<br>!-->
+<br>Ability ranges from 0-2 at 0 cheer, to 3-5 at the highest threshold.
+<br>Cheer thresholds are spaced out roughly every 2-4 cheer, with the highest possible threshold at 10 cheer.
+<br><h3>BOOST CARDS:</h3>
+{% for boostCard in allBoostCards %}
+	{{ boostCard.getRulesCardHTML|safe }}
+{% endfor %}
+<!--<b>Basic Cards (Cheer/Bet):</b>
+<br><b>Supporter</b> (0/0): Play this card face up on a competitor who is not yet supported. This card is worth 5 bet. If the competitor you play this on wins, gain points equal to all bet played on them (divided among all supporters).
+<br><b>Good Cheer</b> (4/0)
+<br><b>Small Cheer</b> (3/1)
+<br><b>Big Bet</b> (1/3)
+<br><b>Bigger Bet</b> (0/4)
+<br><b>Buzzkill</b> (-3/0)
+<br>
+<br><b>Advanced Cards:</b>
+<br><b>Bonus</b> (2/0): You gain 2 points.
+<br><b>Called Shot</b> (0/6): Play this card face up.
+<br><b>Inverter</b> (0/0): Before anything else, switch the cheer and bet values (listed in parentheses next to the name) of all cards played on this competitor.
+<br><b>Backup Plan</b> (0/0): If you didn't support this competitor and they win, you gain 3 points.
+<br><b>Solo Star</b> (7/0): If anyone else played a positive cheer card on this competitor, this card does nothing.-->
+<br><h3>PERFORMANCE CARD VALUES:</h3>
++4, +2, +1, +0.5, +0, -1<br>
+<br>
+<input type="button" onclick="location.href='{{ lobbyURL }}'" value="Back to lobby">

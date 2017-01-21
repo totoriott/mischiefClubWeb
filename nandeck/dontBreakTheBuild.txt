@@ -1,0 +1,62 @@
+LINKMULTI = count
+LINK = tablesaltR2.xlsx
+[all]="1-54"
+[version]="v2"
+
+IF = [playerstr] = "P1"
+rectangle=[all],0,0,100%,100%,#CC8888
+ENDIF
+
+IF = [playerstr] = "P2"
+rectangle=[all],0,0,100%,100%,#8888BB
+ENDIF
+
+IF = [playerstr] = "P3"
+rectangle=[all],0,0,100%,100%,#88BB88
+ENDIF
+
+IF = [playerstr] = "P4"
+rectangle=[all],0,0,100%,100%,#DAA555
+ENDIF
+
+FONT = Arial, 24, F, #000000
+TEXT = [all], [name], 30%, 0, 70%, 16%, center
+
+IF = [cheer] >= -99
+FONT = Arial, 32, T, #0000FF
+ELLIPSE = [all], 5%, 5%, 1.2, 1.2, #DDDDFF, #DDDDFF, 0.2
+TEXT = [all], [cheer], 5%, 2%, 20%, 20%
+ENDIF
+
+IF = [bet] >= -99
+FONT = Arial, 32, T, #FF0000
+TRIANGLE = [all], 0.9, 2, 0.2, 3.3, 1.6, 3.3, #FFDDDD, #FFDDDD, 0.2
+TEXT = [all], [bet], 5%, 20%, 20%, 20%
+ENDIF
+
+FONT = Arial, 16, T, #000000
+IF = [specialcard] >= 0
+TEXT = [all], "[playerstr] - Advanced", 00%, 85%, 100%, 20%
+ELSE
+TEXT = [all], "[playerstr]", 00%, 85%, 100%, 20%
+ENDIF
+
+FONT = Arial, 16, F, #000000
+TEXT = [all], [infotext], 5%, 40%, 90%, 50%, left, wordwrap
+
+TEXT = [all], "[version]", 80%, 80%, 15%, 10%
+
+FONT = Arial, 64, T, #FF0000
+IF = [crowdbet] >= 0
+TRIANGLE = [all], 3.1, 0.5, 1.6, 3.5, 4.6, 3.5, #FFDDDD, #FFDDDD, 0.2
+TEXT = [all], "+[crowdbet]", 20%, 10%, 60%, 20%, center
+FONT = Arial, 24, T, #FF0000
+TEXT = [all], "bet", 20%, 25%, 60%, 20%, center
+ENDIF
+
+FONT = Arial, 64, T, #000000
+IF = [performance] >= 0
+TEXT = [all], "+[performance]", 20%, 10%, 60%, 20%, center
+FONT = Arial, 24, T, #000000
+TEXT = [all], "ability", 20%, 25%, 60%, 20%, center
+ENDIF

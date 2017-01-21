@@ -1,0 +1,90 @@
+<head>
+<title>Mischief Club</title>
+{% load staticfiles %}
+<link href='{% static "stylesheet.css" %}' rel="stylesheet">
+</head>
+
+<b>Mischief Club</b><br>
+a short gambling card game<br>
+<i>v0.7 - 5/14/2016 - by <a href="http://www.twitter.com/sayumeki">sayumeki</a> and <a href="http://twitter.com/kougetsu_yuu">桐生仮名子</a></i><br>
+<br>
+<a href="/rules/"><b>Rules / Card List</b></a><br>
+<br>
+<table style="background-color:#DDDDDD; margin:0px 0px 0px -2px">
+<tr><td>
+Welcome to <b>Mischief Club!</b><br>
+<br>
+Mischief Club is a <b>fast</b>, <b>simultaneously played</b> card game<br>
+where players attempt to <b>outwit their opponents</b>, gambling on<br>
+a fantasy sport and attempting to raise their competitor to victory.<br>
+<br>
+To get started playing, feel free to <b>jump into a solo game</b> with 3 CPUs.<br>
+There's a <b>quick start guide</b> which should explain the basics.<br>
+If you want more detailed rules, check out the <b>rules page!</b><br>
+The AI isn't too complex, but should give you space to learn the game and experiment.<br>
+<br>
+I've opened a bunch of empty games below for you to jump in for <b>multiplayer</b> as well.<br>
+Play 2-player for a <b>more strategic</b> game, or 4-player if you prefer more chaos!<br>
+<br>
+Please do <b>contact me via Twitter</b> at the link above if you have feedback.<br>
+I hope you'll <b>have a great time</b> trying Mischief Club!<br>
+</tr></td>
+</table>
+<br>
+LOBBY<br>
+<br>
+{% if enterNotificationText|length > 0 %}
+	<b>{{ enterNotificationText }}</b><br><br>
+{% endif %}
+<form method="post" action="">
+Enter your name: <input type="text" maxlength="20" size="20" width="20" id="playerEnterName" name="playerEnterName" value="Player"><br>
+Enter a 4-digit player passcode: <input type="text" maxlength="4" size="4" width="4" id="playerEnterCode" name="playerEnterCode" value="0000"> (stored as plaintext, don't use a secure code)<br>
+Enter a 4-digit room passcode: <input type="text" maxlength="4" size="4" width="4" id="roomEnterCode" name="roomEnterCode" value="0000"><br>
+<br>
+<input type="submit" name="startSoloGame" value="Start solo game against AI"> or join a multiplayer game:<br>
+{% if False %}<input type="submit" name="simulateAiGame" value="Simulate AI game"><br>{% endif %}
+	{% csrf_token %}
+	{% for publicGame in publicGameList %}
+		{{ publicGame.gameListString }}
+		{% for playerButton in publicGame.playerJoinButtonTuples %}
+			<input type="submit" name="submitPublicGame,{{ playerButton.1 }}" value="{{ playerButton.0 }}" {% if playerButton.2 %}disabled{% endif %}>
+		{% endfor %}<br>
+	{% endfor %}
+<br>
+<input type="button" id="finishedGameButton" value="Show finished games" onclick="toggleFinishedGames();"><br>
+<span id="finishedGameSpan" style="display:none;">
+	View a finished game:<br>
+	{% csrf_token %}
+	{% for publicGame in finishedPublicGameList %}
+		{{ publicGame.gameListString }}
+		{% for playerButton in publicGame.playerJoinButtonTuples %}
+			<input type="submit" name="submitPublicGame,{{ playerButton.1 }}" value="{{ playerButton.0 }}" {% if playerButton.2 %}disabled{% endif %}>
+		{% endfor %}<br>
+	{% endfor %}
+</span>
+<br>
+</form>
+<script>
+	function toggleFinishedGames() {
+    	var span = document.getElementById("finishedGameSpan");
+
+    	if (span.style.display == "block") {
+	        span.style.display = "none";
+	        document.getElementById("finishedGameButton").value = "Show finished games";
+	    }
+	    else {
+	        span.style.display = "block";
+	        document.getElementById("finishedGameButton").value = "Hide finished games";
+	    }
+    }
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69475036-1', 'auto');
+  ga('send', 'pageview');
+
+</script>

@@ -1,0 +1,280 @@
+<head>
+<title>Mischief Club - Game {{ gameManager.currentGameId }}, P{{ gameManager.selectedPlayerIdPlusOne }}</title>
+{% load staticfiles %}
+<link href='{% static "stylesheet.css" %}' rel="stylesheet">
+</head>
+
+<body onload="onLoad()">
+<!-- gameManager is passed in from viewGame.py -->
+<input type="button" onclick="location.href='{{ lobbyURL }}'" value="Back to lobby"> 
+<input type="button" onclick="location.href=location.href" value="Refresh"> 
+<input type="button" onclick="confirmLeaveGame()" value="Leave Game"> 
+<input type="button" onclick="confirmToggleAi()" value="Toggle AI">
+<br>
+<br>
+<table style="background-color:#EEEEEE">
+	<tr><td><b>Quick Start Guide:</b>
+	<input type="button" onclick="toggleMatchSpan(9999)" id="matchSpan9999Button" value="Show"><br>
+		<span id="matchSpan9999" style="display:none">
+		Earn the most points by betting big on your favorite competitor and guiding them to victory!<br>
+		<br>
+		Each match consists of multiple rounds, where each player <b>simultaneously plays one card</b> on any competitor.<br>
+		Cards are played <b>secretly</b> - you know who each player played a card on, but not what card.<br>
+		Each player starts with an <b>identical hand</b> of cards.<br>
+		After every match, players can <b>switch</b> one card from their hand for a more <b>advanced card</b>.<br>
+		<br>
+		Cards can increase <b>cheer</b>, which boosts a competitor's <b>ability</b> - each character grows at a different rate.<br>
+		<table><tr>
+			<td style='text-align: center'>0 cheer &#8594;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>2</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>3</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>4</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>&nbsp;</td>
+			<td style='text-align: center; width:16px;background-color:#BBBBBB'>10</td>
+			<td style='text-align: center'>&#8592; 10 cheer</td></tr></table>
+		For example, the above chart shows a competitor that starts with 2 ability at 0 cheer.<br>
+		They grow to 3 ability at 3 cheer, 4 ability at 7 cheer, and 5 ability at 10 cheer or more.<br>
+		<br>
+		Cards can also increase <b>bet</b>, the amount of points whoever supports that competitor will earn if they win.<br>
+		You can't support someone who's already been supported, so <b>don't wait too long to support</b>!<br>
+		<br>
+		When all players have supported, the played cards are revealed, and each competitor's ability is calculated.<br>
+		Each competitor will recieve a <b>random ability boost</b>, from -1 to 4; each competitor will get a different number.<br>
+		The <b>highest ability wins</b> the match! Highest cheer, and then highest random boost, break ties.<br>
+		<br>
+		Good luck!
+		</span>
+	</td></tr>
+</table><br>
+<b><i>{{ gameManager.notificationText }}</i></b><br><br>
+{% for uiMatch in gameManager.UImatches %}
+<table style="background-color:#EEEEEE">
+<tr><td>
+	<b>Match {{ uiMatch.matchIdPlusOne }} of {{ gameManager.UImatchesInGame }}:</b> 
+	<input type="button" onclick="toggleMatchSpan({{ uiMatch.matchId }})" id="matchSpan{{ uiMatch.matchId }}Button" value="Show"><br>
+	<span id="matchSpan{{ uiMatch.matchId }}" style="display:block">
+		<table>
+			<td valign="top">
+				<table>
+					{% for cheerAbilityStrings in uiMatch.uiSidebar %}
+					<tr>
+						{% for cheerTuple in cheerAbilityStrings %}
+							<td style="min-width:80px;{{ cheerTuple.1|safe }}" 
+								onclick="selectRadioButton('{{ cheerTuple.2 }}')">{{ cheerTuple.0|safe }}
+							</td>
+						{% endfor %}
+					</tr>
+				{% endfor %}
+				</table>
+			</td>
+
+			<td>
+			{% if uiMatch.isCurrentMatch %}
+
+				{% if gameManager.UIactivePlayerCanPlayCard %}
+				<form method="post" name="playerActionForm" action="">
+					Click a card to play:<br>
+					<table>
+						<tr>
+						{% for cardTuple in gameManager.UIcardPlayOptions %}
+								<td onclick="selectRadioButton('optionCard{{cardTuple.0}}')" style="min-width:128px;text-align:center;{{cardTuple.3}}"><input style="display:none" type="radio" name="optionCard" id="optionCard{{cardTuple.0}}" value="{{cardTuple.0}}">{{ cardTuple.1|safe }}</td>
+						{% endfor %}
+						</tr>
+						<tr><td style="background-color:#CCCCCC;width:640px" colspan="6"><span name="selectedCardInfo" id="selectedCardInfo"/>Selected card info will be displayed here!</td></tr>
+					</table>
+					<br>
+					Double-click a competitor to play the card on:
+					<input type="hidden" id="playerDataVersion" name="playerDataVersion" value="{{ gameManager.activePlayer.playerDataVersion }}">
+					{% csrf_token %}
+				{% endif %}
+
+				{% if gameManager.UIactivePlayerMustDraftCard %}
+				<form method="post" name="playerActionForm" action="">
+					Click a card to remove:<br>
+					<table>
+						<tr>
+						{% for cardTuple in gameManager.UIcardRemoveOptions %}
+								<td onclick="selectRadioButton('optionRemoveCard{{cardTuple.0}}')" style="min-width:128px;text-align:center;{{cardTuple.3}}"><input style="display:none" type="radio" name="optionRemoveCard" id="optionRemoveCard{{cardTuple.0}}" value="{{cardTuple.0}}">{{ cardTuple.1|safe }}</td>				
+						{% endfor %}
+						</tr>
+						<tr><td style="background-color:#CCCCCC;width:640px" colspan="6"><span name="removedCardInfo" id="removedCardInfo"/>Selected card info will be displayed here!</td></tr>
+					</table>
+					<br>
+					Double-click a card to add:<br>
+					<table>
+						<tr>
+						{% for cardTuple in gameManager.UIcardAddOptions %}
+								<td onclick="selectAndSubmitRadioButton('optionAddCard{{cardTuple.0}}','{{uiMatch.isCurrentMatch}}')" style="min-width:128px;text-align:center;{{cardTuple.3}}"><input style="display:none" type="radio" name="optionAddCard" id="optionAddCard{{cardTuple.0}}" value="{{cardTuple.0}}">{{ cardTuple.1|safe }}</td>		
+						{% endfor %}
+						</tr>
+						<tr><td style="background-color:#CCCCCC;width:640px" colspan="6"><span name="addedCardInfo" id="addedCardInfo"/>Selected card info will be displayed here!</td></tr>
+					</table>
+					<input type="submit" style="display:none" value="Submit" id="submitCardDraft">
+					<br>
+					<input type="hidden" id="playerDataVersion" name="playerDataVersion" value="{{ gameManager.activePlayer.playerDataVersion }}">
+					{% csrf_token %}
+				{% endif %}
+
+			{% endif %}
+			<table>
+			{% for cheerAbilityStrings in uiMatch.competitorCheerAbilityStrings %}
+				<tr>
+					{% for cheerTuple in cheerAbilityStrings %}
+						<td style="min-width:240px;{{ cheerTuple.1|safe }}" 
+							onclick="selectAndSubmitRadioButton('{{ cheerTuple.2 }}','{{uiMatch.isCurrentMatch}}')" 
+							>
+							{% if uiMatch.isCurrentMatch and gameManager.UIactivePlayerCanPlayCard %} <!-- draw the chara selection buttons -->
+								{% for cardTuple in gameManager.UIcardTargetOptions %}
+									{% if cardTuple.1 in cheerTuple.0 %}
+										<input type="radio" style="display:none" name="optionTarget" id="optionTarget{{cardTuple.0}}" value="{{cardTuple.0}}">
+									{% endif %}
+								{% endfor %}
+							{% endif %}{{ cheerTuple.0|safe }}
+						</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+			</table>
+
+			{% if uiMatch.isCurrentMatch %}
+				{% if gameManager.UIactivePlayerCanPlayCard%}
+						<input style="display:none" type="submit" value="Submit" id="submitCardPlay">
+					</form>
+				{% endif %}
+			{% endif %}
+		</td>
+	</span>
+	</td></tr>
+</table>
+</table>
+<br>
+{% endfor %}
+</body>
+<script type="text/javascript">
+
+    function onLoad() {
+
+    }
+
+    function confirmLeaveGame() {
+    	reallyLeave = confirm("Do you want to leave your spot in the game?\n\nIf you do, anyone can join in your spot!");
+		if (reallyLeave == true) {
+    		location.href=location.href + 'leave/'; 
+    	}
+    }
+
+    function confirmToggleAi() {
+    	reallyLeave = confirm("Do you want to toggle AI for this player?");
+		if (reallyLeave == true) {
+    		location.href=location.href + 'toggleAi/'; 
+    	}
+    }
+
+    setTimeout(function() { checkForUpdate() }, 5000);
+    function checkForUpdate()
+	{
+	    var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.onreadystatechange = function() { 
+	        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+	        {
+	            serverDataVersion = parseInt(xmlHttp.responseText); // TODO: better error checking
+	            if (serverDataVersion != {{ gameManager.gameData.dataVersion }}) {
+	            	location.href=location.href;
+	            } else {
+	            	setTimeout(function() { checkForUpdate() }, 5000);
+	            }
+	        }
+	    }
+	    xmlHttp.open("GET", "./gameStatus/", true); // true for asynchronous 
+	    xmlHttp.send(null);
+	}
+
+	function toggleMatchSpan(matchId) {
+    	spanId = "matchSpan" + matchId;
+    	var span = document.getElementById(spanId);
+
+    	if (span.style.display == "block") {
+	        span.style.display = "none"; 
+	        document.getElementById(spanId + "Button").value = "Show";
+	    }
+	    else {
+	        span.style.display = "block";
+	        document.getElementById(spanId + "Button").value = "Hide";
+	    }
+    }
+
+    function selectRadioButton(spanId) {
+    	var neutralColor = "#CCCCCC";
+    	var playerColor = "{{gameManager.UIplayerCellColor}}"
+
+    	theThing = document.getElementById(spanId);
+    	if (theThing) {
+    		// take all the radios with that name that player has selected and uncolor them
+    		var radios = document.getElementsByName( theThing.name );
+    		for (var i = 0; i < radios.length; i++) {
+    			var radioButton = radios[i];
+    			if (radioButton.checked) {
+    				radioButton.parentElement.style.backgroundColor = neutralColor;
+    			}
+    		}
+
+    		// color this button properly
+    		theThing.parentElement.style.backgroundColor = playerColor;		
+
+	    	// HOTFIX to make switching no cards from your hand just submit:
+	    	if (spanId == 'optionRemoveCard100' && theThing.checked) {
+	    		document.forms["playerActionForm"].submit()
+	    	}
+
+    		// then check it
+	    	theThing.checked = true;
+
+	    	intValue1 = parseInt(spanId.replace(/[A-Za-z$-]/g, ""));
+
+	    	// HACK
+	    	if (spanId.indexOf("100") > 0) { // MORE HACK
+	    		document.getElementById("removedCardInfo").innerHTML = "Choose not to change any cards in your hand."
+	    	} else if (spanId.indexOf("RemoveCard") > 0) {
+	    		var descriptions = {{ gameManager.UIcardRemoveDescriptions|safe }}
+	    		document.getElementById("removedCardInfo").innerHTML = descriptions[intValue1];
+	    	} else if (spanId.indexOf("AddCard") > 0) {
+	    		var descriptions = {{ gameManager.UIcardAddDescriptions|safe }}
+	    		document.getElementById("addedCardInfo").innerHTML = descriptions[intValue1];
+	    	} else if (spanId.indexOf("Card") > 0) {
+	    		var descriptions = {{ gameManager.UIcardPlayDescriptions|safe }}
+	    		document.getElementById("selectedCardInfo").innerHTML = descriptions[intValue1];
+	    	}
+    	}
+    }
+
+    function selectAndSubmitRadioButton(spanId, isCurrentMatch) {
+    	// this actually will only submit if you double-click it
+    	// TODO: don't let you double press if loading
+
+    	theThing = document.getElementById(spanId);
+    	if (theThing) {
+    		if (theThing.checked && isCurrentMatch == 'True') { // don't ask about this terrible hack
+	    		document.forms["playerActionForm"].submit()
+	    	} else {
+    			selectRadioButton(spanId);
+	    	}
+	    }
+    }
+
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69475036-1', 'auto');
+  ga('send', 'pageview');
+
+</script>

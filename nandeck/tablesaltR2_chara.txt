@@ -1,0 +1,23 @@
+LINK = tablesaltR2_chara.xls
+FONT = Arial, 24, F, #000000
+TEXT = 1-19, [name], 5%, 0, 90%, 15%, center
+
+IF = [ability1] >= 0
+TEXT = 1-19, "[cheer1] cheer / [ability1] ability", 5%, 20%, 90%, 15%, left
+ENDIF
+
+IF = [ability2] > 0
+TEXT = 1-19, "[cheer2] cheer / [ability2] ability", 5%, 35%, 90%, 15%, left
+ENDIF
+
+IF = [ability3] > 0
+TEXT = 1-19, "[cheer3] cheer / [ability3] ability", 5%, 50%, 90%, 15%, left
+ENDIF
+
+IF = [ability4] > 0
+TEXT = 1-19, "[cheer4] cheer / [ability4] ability", 5%, 65%, 90%, 15%, left
+ENDIF
+
+IF = [ability5] > 0
+TEXT = 1-19, "[cheer5] cheer / [ability5] ability", 5%, 80%, 90%, 15%, left
+ENDIF
