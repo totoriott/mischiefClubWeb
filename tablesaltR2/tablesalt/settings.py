@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = ['tablesalt.megane-moe.com']
+ALLOWED_HOSTS = ['tablesalt.megane-moe.com', '127.0.0.1']
 
 
 # Application definition
@@ -34,7 +34,7 @@ INSTALLED_APPS = (
 
 LOCKDOWN_PASSWORDS = ('bergamot');
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,9 +43,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'django.middleware.security.SecurityMiddleware',
-    'lockdown.middleware.LockdownMiddleware',
+    #'lockdown.middleware.LockdownMiddleware',
 	'tablesaltGame.middleware.StatsMiddleware',
-)
+]
 
 ROOT_URLCONF = 'tablesalt.urls'
 
@@ -127,11 +127,29 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'bookshelf'),)
 
 # Deployment settings
 # thanks http://wiki.dreamhost.com/Django
-STATICFILES_DIRS = [];
-STATIC_ROOT = "../public/bookshelf";
+# STATICFILES_DIRS = [];
+#STATIC_ROOT = "../public/bookshelf";
 # DEBUG = False;
-TEMPLATE_DEBUG = False;
+#TEMPLATE_DEBUG = False;
 #SESSION_COOKIE_SECURE = True;
 #CSRF_COOKIE_SECURE = True;
 #CSRF_COOKIE_HTTPONLY = True;
 #X_FRAME_OPTIONS = 'DENY';
+
+# get the site running with django 1.10; not sure if this is prodworthy
+# from http://stackoverflow.com/questions/34298867/django-settings-unknown-parameters-template-debug
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
